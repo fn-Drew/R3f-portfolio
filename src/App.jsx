@@ -16,7 +16,7 @@ function Text() {
             <mesh rotation={[0.1, 0, 0]}>
                 <Text3D
                     font={font}
-                    size={0.5}
+                    size={0.35}
                     bevelEnabled
                     bevelSize={0.01}
                     height={0.02}
@@ -35,7 +35,7 @@ export default function App() {
     return (
         <div className="h-screen overflow-hidden max-h-screen max-w-screen flex flex-col bg-black ">
 
-            <div className="basis-1/4 ">
+            <div className="basis-1/2">
                 <Canvas
                     camera={{
                         fov: 75, near: 0.1, far: 1000, position: [0, 0, 2],
@@ -50,15 +50,15 @@ export default function App() {
                 </Canvas>
             </div>
 
-            <div className="basis-3/4 snap-mandatory snap-x flex items-center space-x-12 w-screen overflow-x-scroll">
-                <div className="snap-center text-white flex-shrink-0 h-2/3 w-full bg-slate-700">
-                    aoristenaroisetn
+            <div className="basis-1/2 snap-x flex overflow-x-scroll ">
+                <div className="snap-center m-32 text-center text-white flex-shrink-0 w-64 bg-slate-700">
+                    aroistenrasoiet
                 </div>
-                <div className="snap-center text-white flex-shrink-0 h-2/3 w-full bg-slate-700">
-                    aoristenaroisetn
+                <div className="snap-center m-32 text-center text-white flex-shrink-0 w-64 bg-slate-700">
+                    aroistenrasoiet
                 </div>
-                <div className="snap-center text-white flex-shrink-0 h-2/3 w-full bg-slate-700">
-                    aoristenaroisetn
+                <div className="snap-center m-32 text-center text-white flex-shrink-0 w-64 bg-slate-700">
+                    aroistenrasoiet
                 </div>
             </div>
 
