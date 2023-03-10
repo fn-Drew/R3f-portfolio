@@ -2,7 +2,7 @@
 import React from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
-    OrbitControls, Text3D, Float, Center, Html,
+    Text3D, Float, Center,
 } from '@react-three/drei';
 import { NodeToyMaterial, NodeToyTick } from '@nodetoy/react-nodetoy';
 import glitchShader from './glitchData';
@@ -13,15 +13,15 @@ function Text() {
     const name = 'Andrew\nGarfunkel';
     return (
         <Float>
-            <mesh rotation={[0.18, 0, 0]}>
+            <mesh rotation={[0.1, 0, 0]}>
                 <Text3D
                     font={font}
-                    size={0.175}
+                    size={0.5}
                     bevelEnabled
                     bevelSize={0.01}
-                    height={0.05}
+                    height={0.02}
                     bevelSegments={10}
-                    position={[-0.375, 1, 0]}
+                    position={[0, 0, 0]}
                 >
                     {name}
                     <NodeToyMaterial data={glitchShader} />
@@ -33,28 +33,36 @@ function Text() {
 
 export default function App() {
     return (
-        <Canvas
-            camera={{
-                fov: 75, near: 0.1, far: 1000, position: [0, 0, 2],
-            }}
-        >
-            <NodeToyTick />
-            <OrbitControls enableZoom={false} />
-            <directionalLight position={[0, 0, 5]} intensity={0.5} />
+        <div className="h-screen overflow-hidden max-h-screen max-w-screen flex flex-col bg-black ">
 
-            <Center disableY>
-                <Html>
-                    <div style={{ color: 'red', fontSize: 40 }}>
-                        ega goga
-                    </div>
-                    <div style={{ color: 'red' }}>
-                        ega goga
-                    </div>
-                </Html>
-                <Text />
-            </Center>
+            <div className="basis-1/4 ">
+                <Canvas
+                    camera={{
+                        fov: 75, near: 0.1, far: 1000, position: [0, 0, 2],
+                    }}
+                >
+                    <NodeToyTick />
+                    <directionalLight position={[0, 0, 5]} intensity={0.5} />
 
-        </Canvas>
+                    <Center disableY>
+                        <Text />
+                    </Center>
+                </Canvas>
+            </div>
+
+            <div className="basis-3/4 snap-mandatory snap-x flex items-center space-x-12 w-screen overflow-x-scroll">
+                <div className="snap-center text-white flex-shrink-0 h-2/3 w-full bg-slate-700">
+                    aoristenaroisetn
+                </div>
+                <div className="snap-center text-white flex-shrink-0 h-2/3 w-full bg-slate-700">
+                    aoristenaroisetn
+                </div>
+                <div className="snap-center text-white flex-shrink-0 h-2/3 w-full bg-slate-700">
+                    aoristenaroisetn
+                </div>
+            </div>
+
+        </div>
     );
 }
 
