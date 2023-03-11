@@ -94,7 +94,7 @@ export default function App() {
                 {/* bio */}
                 <InView
                     as="div"
-                    threshold={0}
+                    threshold={0.4}
                     onChange={(inView) => setVisibleContent({ ...visibleContent, bio: inView })}
                     className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0"
                 >
@@ -105,7 +105,7 @@ export default function App() {
                 {/* tech component */}
                 <InView
                     as="div"
-                    threshold={0}
+                    threshold={0.5}
                     onChange={(inView) => setVisibleContent({ ...visibleContent, tech: inView })}
                     className="snap-center grid grid-cols-2 bg-slate-800/70 rounded-3xl text-center w-3/4 m-16 text-white flex-shrink-0"
                 >
@@ -122,7 +122,7 @@ export default function App() {
                 {/* project component */}
                 <InView
                     as="div"
-                    threshold={0}
+                    threshold={0.5}
                     onChange={(inView) => setVisibleContent({ ...visibleContent, nft: inView })}
                     className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0"
                 >
