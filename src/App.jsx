@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unknown-property */
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
     Text3D, Float, Center,
@@ -10,8 +10,7 @@ import glitchShader from './glitchData';
 import './App.css';
 import font from './fonts/IBM_Plex_Sans_Regular.json';
 
-function Text() {
-    const name = 'Andrew\nGarfunkel';
+function Text({ children }) {
     return (
         <Float>
             <mesh rotation={[0.1, 0, 0]}>
@@ -24,7 +23,7 @@ function Text() {
                     bevelSegments={10}
                     position={[0, 0, 0]}
                 >
-                    {name}
+                    {children}
                     <NodeToyMaterial data={glitchShader} />
                 </Text3D>
             </mesh>
@@ -32,7 +31,18 @@ function Text() {
     );
 }
 
+function ContentSwitch({ children }) {
+    return children.find((child) => {
+        if (!child.props.visible) {
+            return false;
+        }
+        return true;
+    });
+}
+
 export default function App() {
+    const [visibleContent, setVisibleContent] = useState({ bio: true });
+
     return (
         <div className="h-screen overflow-hidden max-h-screen max-w-screen flex flex-col bg-black ">
 
@@ -47,7 +57,14 @@ export default function App() {
                         <directionalLight position={[0, 0, 5]} intensity={0.5} />
 
                         <Center disableY>
-                            <Text />
+                            <ContentSwitch>
+                                <Text visible={visibleContent.bio} content="bio">
+                                    bio
+                                </Text>
+                                <Text visible={visibleContent.nft} content="nft">
+                                    nft
+                                </Text>
+                            </ContentSwitch>
                         </Center>
                     </Canvas>
                 </Suspense>
@@ -55,8 +72,14 @@ export default function App() {
 
             <div className="basis-2/3 snap-x flex overflow-x-scroll">
 
+                {/* bio */}
+                <InView as="div" threshold={0} onChange={(inView) => setVisibleContent({ ...visibleContent, bio: inView })} className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0">
+                    <h1 className="text-2xl text-white/90 font-bold">bio</h1>
+                    <p className="text-lg text-gray-300/70">Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.</p>
+                </InView>
+
                 {/* project component */}
-                <InView as="div" threshold={0.5} delay={500000} onChange={(inView, entry) => console.log('NFT visible:', inView)} className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0">
+                <InView as="div" threshold={0} onChange={(inView) => setVisibleContent({ ...visibleContent, nft: inView })} className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0">
                     <h1 className="text-2xl text-white/90 font-bold">NFT Validator</h1>
                     <p className="text-lg text-gray-300/70">tap to view more</p>
                 </InView>
