@@ -2,9 +2,10 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
-    Text3D, Float, Center, PresentationControls,
+    Text3D, Float, Center,
 } from '@react-three/drei';
 import { NodeToyMaterial, NodeToyTick } from '@nodetoy/react-nodetoy';
+import { InView } from 'react-intersection-observer';
 import glitchShader from './glitchData';
 import './App.css';
 import font from './fonts/IBM_Plex_Sans_Regular.json';
@@ -55,10 +56,10 @@ export default function App() {
             <div className="basis-2/3 snap-x flex overflow-x-scroll">
 
                 {/* project component */}
-                <div className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0">
+                <InView as="div" threshold={0.5} delay={500000} onChange={(inView, entry) => console.log('NFT visible:', inView)} className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0">
                     <h1 className="text-2xl text-white/90 font-bold">NFT Validator</h1>
                     <p className="text-lg text-gray-300/70">tap to view more</p>
-                </div>
+                </InView>
 
                 {/* tech component */}
                 <div className="snap-center grid grid-cols-2 bg-slate-800/70 rounded-3xl text-center w-3/4 m-16 text-white flex-shrink-0 ">
