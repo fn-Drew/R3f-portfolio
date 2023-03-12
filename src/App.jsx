@@ -1,9 +1,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unknown-property */
-import React, { Suspense, useRef, useState } from 'react';
+import React, {
+    Suspense, useEffect, useRef, useState,
+} from 'react';
+import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import {
-    Text3D, Float, Center,
+    Text3D, Float, Center, OrbitControls, PresentationControls,
 } from '@react-three/drei';
 import { NodeToyMaterial, NodeToyTick } from '@nodetoy/react-nodetoy';
 import { InView } from 'react-intersection-observer';
@@ -11,23 +14,46 @@ import glitchShader from './glitchData';
 import './App.css';
 import font from './fonts/IBM_Plex_Sans_Regular.json';
 
-function Text({ children }) {
+function Text({ children, visibleContent }) {
+    const textRef = useRef();
+
+    useEffect(() => {
+        textRef.current.geometry.computeBoundingBox();
+        const { boundingBox } = textRef.current.geometry;
+        const center = new THREE.Vector3();
+        boundingBox.getCenter(center);
+        textRef.current.geometry.translate(-center.x, -center.y, -center.z);
+    }, [visibleContent]);
+
     return (
         <Float>
-            <mesh rotation={[0.1, 0, 0]}>
-                <Text3D
-                    font={font}
-                    size={0.6}
-                    bevelEnabled
-                    bevelSize={0.01}
-                    height={0.02}
-                    bevelSegments={10}
-                    position={[0, 0.3, 0]}
-                >
-                    {children}
-                    <NodeToyMaterial data={glitchShader} />
-                </Text3D>
-            </mesh>
+            <PresentationControls
+                enabled // the controls can be disabled by setting this to false
+                global // Spin globally or by dragging the model
+                cursor // Whether to toggle cursor style on drag
+                snap={false} // Snap-back to center (can also be a spring config)
+                speed={1} // Speed factor
+                zoom={1} // Zoom factor when half the polar-max is reached
+                rotation={[0, 0, 0]} // Default rotation
+                polar={[0, Math.PI / -5]} // Vertical limits
+                azimuth={[-Infinity, Infinity]} // Horizontal limits
+                config={{ mass: 1, tension: 170, friction: 26 }} // Spring config
+            >
+                <mesh rotation={[0.1, 0, 0]}>
+                    <Text3D
+                        ref={textRef}
+                        font={font}
+                        size={0.6}
+                        bevelEnabled
+                        bevelSize={0.01}
+                        height={0.02}
+                        bevelSegments={10}
+                    >
+                        {children}
+                        <NodeToyMaterial data={glitchShader} />
+                    </Text3D>
+                </mesh>
+            </PresentationControls>
         </Float>
     );
 }
@@ -57,6 +83,16 @@ export default function App() {
         });
     };
 
+    function updateContent(name, inView) {
+        if (!inView) {
+            return null;
+        }
+        const newContent = { ...visibleContent };
+        Object.keys(visibleContent).forEach((key) => { newContent[key] = false; });
+        newContent[name] = true;
+        return setVisibleContent(newContent);
+    }
+
     return (
         <div className="h-screen overflow-hidden max-h-screen max-w-screen flex flex-col bg-black ">
 
@@ -70,19 +106,17 @@ export default function App() {
                         <NodeToyTick />
                         <directionalLight position={[0, 0, 5]} intensity={0.5} />
 
-                        <Center disableY>
-                            <ContentSwitch>
-                                <Text visible={visibleContent.bio} content="bio">
-                                    {'Andrew\nGarfunkel'}
-                                </Text>
-                                <Text visible={visibleContent.nft} content="nft">
-                                    {'    NFT\nValidator'}
-                                </Text>
-                                <Text visible={visibleContent.tech} content="tech">
-                                    {'Tech\n I use'}
-                                </Text>
-                            </ContentSwitch>
-                        </Center>
+                        <ContentSwitch>
+                            <Text visibleContent={visibleContent} visible={visibleContent.bio} content="bio">
+                                {'Andrew\nGarfunkel'}
+                            </Text>
+                            <Text visibleContent={visibleContent} visible={visibleContent.nft} content="nft">
+                                {'    NFT\nValidator'}
+                            </Text>
+                            <Text visibleContent={visibleContent} visible={visibleContent.tech} content="tech">
+                                {'Tech\n I use'}
+                            </Text>
+                        </ContentSwitch>
 
                     </Canvas>
                 </Suspense>
@@ -94,9 +128,9 @@ export default function App() {
                 {/* bio */}
                 <InView
                     as="div"
-                    threshold={0.4}
-                    onChange={(inView) => setVisibleContent({ ...visibleContent, bio: inView })}
-                    className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0"
+                    threshold={0.5}
+                    onChange={(inView) => updateContent('bio', inView)}
+                    className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-16 text-center text-white flex-shrink-0"
                 >
                     <h1 className="text-2xl text-white/90 font-bold">bio</h1>
                     <p className="text-lg text-gray-300/70">Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.</p>
@@ -106,7 +140,7 @@ export default function App() {
                 <InView
                     as="div"
                     threshold={0.5}
-                    onChange={(inView) => setVisibleContent({ ...visibleContent, tech: inView })}
+                    onChange={(inView) => updateContent('tech', inView)}
                     className="snap-center grid grid-cols-2 bg-slate-800/70 rounded-3xl text-center w-3/4 m-16 text-white flex-shrink-0"
                 >
                     <div className="tech-icon rounded-tl-3xl bg-blue-500/50 "> react </div>
@@ -123,8 +157,8 @@ export default function App() {
                 <InView
                     as="div"
                     threshold={0.5}
-                    onChange={(inView) => setVisibleContent({ ...visibleContent, nft: inView })}
-                    className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-32 text-center text-white flex-shrink-0"
+                    onChange={(inView) => updateContent('nft', inView)}
+                    className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-16 text-center text-white flex-shrink-0"
                 >
                     <h1 className="text-2xl text-white/90 font-bold">NFT Validator</h1>
                     <p className="text-lg text-gray-300/70">tap to view more</p>
