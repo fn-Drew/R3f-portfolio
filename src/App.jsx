@@ -1,59 +1,52 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unknown-property */
 import React, {
-    Suspense, useEffect, useRef, useState,
+    Suspense, useRef, useState,
 } from 'react';
-import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import {
-    Text3D, Float, Center, OrbitControls, PresentationControls,
+    Text3D, Float, PresentationControls, Center,
 } from '@react-three/drei';
 import { NodeToyMaterial, NodeToyTick } from '@nodetoy/react-nodetoy';
 import { InView } from 'react-intersection-observer';
+import { motion } from 'framer-motion-3d';
 import glitchShader from './glitchData';
 import './App.css';
 import font from './fonts/IBM_Plex_Sans_Regular.json';
 
-function Text({ children, visibleContent }) {
-    const textRef = useRef();
-
-    useEffect(() => {
-        textRef.current.geometry.computeBoundingBox();
-        const { boundingBox } = textRef.current.geometry;
-        const center = new THREE.Vector3();
-        boundingBox.getCenter(center);
-        textRef.current.geometry.translate(-center.x, -center.y, -center.z);
-    }, [visibleContent]);
-
+function Text({ children }) {
     return (
         <Float>
-            <PresentationControls
-                enabled // the controls can be disabled by setting this to false
-                global // Spin globally or by dragging the model
-                cursor // Whether to toggle cursor style on drag
-                snap={false} // Snap-back to center (can also be a spring config)
-                speed={1} // Speed factor
-                zoom={1} // Zoom factor when half the polar-max is reached
-                rotation={[0, 0, 0]} // Default rotation
-                polar={[0, Math.PI / -5]} // Vertical limits
-                azimuth={[-Infinity, Infinity]} // Horizontal limits
-                config={{ mass: 1, tension: 170, friction: 26 }} // Spring config
-            >
-                <mesh rotation={[0.1, 0, 0]}>
-                    <Text3D
-                        ref={textRef}
-                        font={font}
-                        size={0.6}
-                        bevelEnabled
-                        bevelSize={0.01}
-                        height={0.02}
-                        bevelSegments={10}
+            <Center>
+                <PresentationControls
+                    enabled // the controls can be disabled by setting this to false
+                    global // Spin globally or by dragging the model
+                    cursor // Whether to toggle cursor style on drag
+                    snap={false} // Snap-back to center (can also be a spring config)
+                    speed={1} // Speed factor
+                    zoom={1} // Zoom factor when half the polar-max is reached
+                    rotation={[0.1, 0, 0]} // Default rotation
+                    polar={[Math.PI / -8, Math.PI / 8]} // Vertical limits
+                    azimuth={[-0.2, 0.2]} // Horizontal limits
+                    config={{ mass: 1, tension: 300, friction: 30 }} // Spring config
+                >
+                    <motion.mesh
+                        rotation={[0.1, 0, 0]}
                     >
-                        {children}
-                        <NodeToyMaterial data={glitchShader} />
-                    </Text3D>
-                </mesh>
-            </PresentationControls>
+                        <Text3D
+                            font={font}
+                            size={0.6}
+                            bevelEnabled
+                            bevelSize={0.01}
+                            height={0.02}
+                            bevelSegments={10}
+                        >
+                            {children}
+                            <NodeToyMaterial data={glitchShader} />
+                        </Text3D>
+                    </motion.mesh>
+                </PresentationControls>
+            </Center>
         </Float>
     );
 }
@@ -96,7 +89,7 @@ export default function App() {
     return (
         <div className="h-screen overflow-hidden max-h-screen max-w-screen flex flex-col bg-black ">
 
-            <div className="basis-1/3">
+            <div className="basis-1/3 overflow-hidden">
                 <Suspense fallback={<span>loading...</span>}>
                     <Canvas
                         camera={{
@@ -128,7 +121,7 @@ export default function App() {
                 {/* bio */}
                 <InView
                     as="div"
-                    threshold={0.5}
+                    threshold={0.7}
                     onChange={(inView) => updateContent('bio', inView)}
                     className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-16 text-center text-white flex-shrink-0"
                 >
@@ -139,7 +132,7 @@ export default function App() {
                 {/* tech component */}
                 <InView
                     as="div"
-                    threshold={0.5}
+                    threshold={0.7}
                     onChange={(inView) => updateContent('tech', inView)}
                     className="snap-center grid grid-cols-2 bg-slate-800/70 rounded-3xl text-center w-3/4 m-16 text-white flex-shrink-0"
                 >
@@ -156,7 +149,7 @@ export default function App() {
                 {/* project component */}
                 <InView
                     as="div"
-                    threshold={0.5}
+                    threshold={0.7}
                     onChange={(inView) => updateContent('nft', inView)}
                     className="snap-center bg-slate-800/70 flex rounded-3xl flex-col place-content-center w-3/4 m-16 text-center text-white flex-shrink-0"
                 >
