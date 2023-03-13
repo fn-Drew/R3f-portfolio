@@ -116,7 +116,7 @@ export default function App() {
             </div>
 
             {/* NTS remove snap-x to enable horizontal scrolling */}
-            <div ref={scrollRef} onWheel={onWheel} className="basis-2/3 sm:snap-none snap-x flex overflow-x-scroll ">
+            <div ref={scrollRef} onWheel={onWheel} style={{ scrollbarWidth: 'none' }} className="basis-2/3 sm:snap-none snap-x flex overflow-x-scroll">
 
                 {/* daisy bio */}
                 <InView
