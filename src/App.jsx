@@ -9,7 +9,8 @@ import {
 } from '@react-three/drei';
 import { NodeToyMaterial, NodeToyTick } from '@nodetoy/react-nodetoy';
 import { InView } from 'react-intersection-observer';
-import { motion } from 'framer-motion-3d';
+import { motion, AnimatePresence } from 'framer-motion';
+import { motion as motion3d } from 'framer-motion-3d';
 import glitchShader from './glitchData';
 import './App.css';
 import regFont from './fonts/IBM_Plex_Sans_Regular.json';
@@ -25,13 +26,19 @@ function Text({ children }) {
                     snap={{ mass: 4, tension: 1000 }} // Snap-back to center (can also be a spring config)
                     speed={1} // Speed factor
                     zoom={1} // Zoom factor when half the polar-max is reached
-                    rotation={[0.1, 0, 0]} // Default rotation
+                    rotation={[0, 0, 0]} // Default rotation
                     polar={[Math.PI / -8, Math.PI / 8]} // Vertical limits
                     azimuth={[-Math.PI / 8, Math.PI / 8]} // Horizontal limits
                     config={{ mass: 1, tension: 300, friction: 30 }} // Spring config
                 >
-                    <motion.mesh
+                    <motion3d.mesh
+                        transition={{
+                            delay: 0.3,
+                            type: 'spring',
+                            stiffness: 200,
+                        }}
                         rotation={[0.1, 0, 0]}
+                        animate={{ y: [3, 0] }}
                     >
                         <Text3D
                             font={monoFont}
@@ -44,13 +51,14 @@ function Text({ children }) {
                             {children}
                             <NodeToyMaterial data={glitchShader} />
                         </Text3D>
-                    </motion.mesh>
+                    </motion3d.mesh>
                 </PresentationControls>
             </Center>
         </Float>
     );
 }
 
+// switches to content that has a true "visible" prop
 function ContentSwitch({ children }) {
     return children.find((child) => {
         if (!child.props.visible) {
@@ -65,6 +73,8 @@ export default function App() {
 
     const scrollRef = useRef(null);
 
+    // enable scrolling with the mouse wheel
+    //
     const onWheel = (e) => {
         const container = scrollRef.current;
         const containerScrollPosition = scrollRef.current.scrollLeft;
@@ -76,6 +86,8 @@ export default function App() {
         });
     };
 
+    // set each component visibility false,
+    // then set the current component to true
     function updateContent(name, inView) {
         if (!inView) {
             return null;
@@ -101,13 +113,13 @@ export default function App() {
 
                         <ContentSwitch>
                             <Text visibleContent={visibleContent} visible={visibleContent.bio} content="bio">
-                                {'Andrew\nGarfunkel'}
+                                {' Andrew\nGarfunkel'}
                             </Text>
                             <Text visibleContent={visibleContent} visible={visibleContent.nft} content="nft">
                                 {'   NFT\nValidator'}
                             </Text>
                             <Text visibleContent={visibleContent} visible={visibleContent.tech} content="tech">
-                                {'Tech\n I use'}
+                                {' Tech\n I use'}
                             </Text>
                         </ContentSwitch>
 
@@ -146,16 +158,20 @@ export default function App() {
                     as="div"
                     threshold={0.7}
                     onChange={(inView) => updateContent('tech', inView)}
-                    className="snap-center grid grid-cols-2 bg-slate-800/70 rounded-3xl text-center w-3/4 m-16 text-white flex-shrink-0"
+                    className="snap-center grid gap-2 grid-cols-2 rounded-3xl text-center w-3/4 m-16 text-white flex-shrink-0"
                 >
-                    <div className="tech-icon rounded-tl-3xl bg-blue-500/50 "> react </div>
-                    <div className="tech-icon rounded-tr-3xl bg-cyan-500/50"> tailwind </div>
 
-                    <div className="tech-icon bg-[rgb(0,122,204)]/50"> typescript </div>
-                    <div className="tech-icon bg-green-500/50"> node </div>
+                    <div className="tech-icon text-white/80 rounded-tl-3xl bg-[rgb(97,219,251)]/5 border-4 border-[rgb(97,219,251)]/50">
+                        react
+                    </div>
 
-                    <div className="tech-icon rounded-bl-3xl bg-yellow-500/50"> express </div>
-                    <div className="tech-icon rounded-br-3xl bg-green-500/50"> mongo </div>
+                    <div className="tech-icon text-white/80 rounded-tr-3xl bg-[rgb(152,203,59)]/5 border-4 border-[rgb(152,203,59)]/50"> node </div>
+
+                    <div className="tech-icon text-white/80 bg-[rgb(56,189,248)]/5 border-4  border-[rgb(56,189,248)]/50"> tailwind </div>
+                    <div className="tech-icon text-white/80 bg-[rgb(77,176,62)]/5 border-4 border-[rgb(77,176,62)]/50"> mongo </div>
+
+                    <div className="tech-icon text-white/80 rounded-bl-3xl bg-[rgb(0,122,204)]/5 border-4 border-[rgb(0,122,204)]/50"> typescript </div>
+                    <div className="tech-icon text-white/80 rounded-br-3xl bg-green-700/5 border-4 border-green-700/40"> express </div>
                 </InView>
 
                 {/* project component */}
@@ -171,6 +187,7 @@ export default function App() {
 
             </div>
 
+            {/* display for currently viewed component */}
             <div className="flex justify-center space-x-8 py-8">
                 <input disabled defaultChecked={visibleContent.bio} type="radio" className="radio border-none radio-xs disabled:opacity-100" />
                 <input disabled defaultChecked={visibleContent.tech} type="radio" className="radio border-none radio-xs disabled:opacity-100" />
