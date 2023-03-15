@@ -1,25 +1,10 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unknown-property */
-import React, {
-    Suspense, useState,
-} from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Center } from '@react-three/drei';
-import { NodeToyTick } from '@nodetoy/react-nodetoy';
+import React, { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
-import TextHeader from './components/TextHeader';
 import './App.css';
-
-// switches to content that has a true "visible" prop
-function ContentSwitch({ children }) {
-    return children.find((child) => {
-        if (!child.props.visible) {
-            return false;
-        }
-        return true;
-    });
-}
+import DynamicCanvas from './components/DynamicCanvas';
 
 export default function App() {
     const [visibleContent, setVisibleContent] = useState({});
@@ -39,36 +24,9 @@ export default function App() {
     return (
         <div className="h-screen overflow-hidden max-h-screen max-w-screen flex flex-col bg-black ">
 
-            <div className="basis-1/3 overflow-hidden">
-                <Suspense fallback={<span>loading...</span>}>
-                    <Canvas
-                        camera={{
-                            fov: 75, near: 0.1, far: 1000, position: [0, 0, 2],
-                        }}
-                    >
-                        <NodeToyTick />
-                        <directionalLight position={[0, 0, 5]} intensity={0.5} />
+            <DynamicCanvas visibleContent={visibleContent} />
 
-                        <Center>
-                            <ContentSwitch>
-                                <TextHeader visibleContent={visibleContent} visible={visibleContent.bio} content="bio">
-                                    {' Andrew\nGarfunkel'}
-                                </TextHeader>
-                                <TextHeader visibleContent={visibleContent} visible={visibleContent.nft} content="nft">
-                                    {'   NFT\nValidator'}
-                                </TextHeader>
-                                <TextHeader visibleContent={visibleContent} visible={visibleContent.tech} content="tech">
-                                    {' Tech\n I use'}
-                                </TextHeader>
-                            </ContentSwitch>
-                        </Center>
-                    </Canvas>
-                </Suspense>
-            </div>
-
-            {/* NTS remove snap-x to enable horizontal scrolling */}
             <div className="basis-2/3 sm:snap-none snap-x flex overflow-x-scroll">
-
                 {/* daisy bio */}
                 <InView
                     as="div"
